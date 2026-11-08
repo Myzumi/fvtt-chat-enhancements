@@ -4,6 +4,7 @@ import {ASSETS_PATH} from "./constants.mjs";
 
 export default class ActorControl {
     static initialize() {
+        if (document.querySelector("#actor-control-container")) return;
         const favoriteBar = this._createFavoriteBar();
         const selector = this._createSelector();
         const actorControl = document.createElement("div");

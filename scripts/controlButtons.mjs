@@ -3,6 +3,7 @@ import ChatHandler from "./chatHandler.mjs";
 
 export default class ControlButtons {
     static initialize() {
+        if (document.querySelector("#fix-chat-flag, #export-to-html")) return;
         const fixChatFlagButton = this._createButton(
             "fix-chat-flag",
             "wrench",

@@ -17,6 +17,7 @@ Hooks.once("ready", () => {
     const chatLog = ui.chat.element.querySelector(".chat-log");
     const isColoredChat = game.settings.get("mrkb-chat-enhancements", "colored-chat");
     if (isColoredChat) chatLog.classList.remove("themed", "theme-light");
+    TypingAlert.listen();
 });
 Hooks.on("renderAbstractSidebarTab", (tab) => {
     if (tab.id === "chat") {
@@ -25,8 +26,6 @@ Hooks.on("renderAbstractSidebarTab", (tab) => {
         ChatHotkey.initialize();
         ControlButtons.initialize();
         TypingAlert.initialize();
-        TypingAlert.clearOldTypingAlerts();
-        TypingAlert.startClearingInterval();
 
         const isColoredChat = game.settings.get("mrkb-chat-enhancements", "colored-chat");
         const isNewFont = game.settings.get("mrkb-chat-enhancements", "new-font");
@@ -51,7 +50,7 @@ Hooks.on("getChatMessageContextOptions", (chatLog, options) => {
         icon: '<i class="fa-solid fa-pen-to-square"></i>',
         condition: li => {
             const message = game.messages.get(li.dataset.messageId);
-            return ((game.user.isGM || message.isAuthor) && message.type !== 5);
+            return ((game.user.isGM || message.isAuthor) && !message.isRoll);
         },
         callback: li => ChatEditor._edit(li.dataset.messageId)
     }

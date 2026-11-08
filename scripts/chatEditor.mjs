@@ -2,6 +2,7 @@ import {ASSETS_PATH} from "./constants.mjs";
 
 export default class ChatEditor {
     static initialize() {
+        if (document.querySelector("#chat-editor")) return;
         const placeholder = document.createElement("div");
         placeholder.id = "chat-editor-placeholder";
         placeholder.innerHTML = "<i class=\"fa-solid fa-pen-to-square\"></i>" + game.i18n.localize("MRKB.ChatEditPlaceholder");

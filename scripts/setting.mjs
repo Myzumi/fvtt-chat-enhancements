@@ -1,5 +1,3 @@
-import TypingAlert from "./typingAlert.mjs";
-
 export default class Setting {
 	static get(key) {
 		return game.settings.get("mrkb-chat-enhancements", key);
@@ -79,17 +77,6 @@ export default class Setting {
 			default: "normal"
 		});
 		
-		/*UTILITY*/
-
-		game.settings.register("mrkb-chat-enhancements", "typing-players", {
-			name: "입력 중인 플레이어",
-			scope: "client",
-			config: false,
-			type: Array,
-			default: [],
-			onChange: (value) => TypingAlert.handleTypingAlert(value)
-		});
-
 		/*UI Toggle*/
 
 		game.settings.register("mrkb-chat-enhancements", "ui-actor", {

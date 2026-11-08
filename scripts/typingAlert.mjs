@@ -1,7 +1,15 @@
-import Setting from "./setting.mjs";
+const SOCKET = "module.mrkb-chat-enhancements";
+const TIMEOUT = 2000;       // a player counts as typing for this long after their last ping
+const EMIT_INTERVAL = 1000; // send at most one ping per second, not one per keystroke
 
 export default class TypingAlert {
+    static #typing = new Map(); // userId -> { userName, timestamp }
+    static #lastEmit = 0;
+    static #lastText = "";
+
     static initialize() {
+        if (document.querySelector("#typing-alert-container")) return;
+
         const container = document.createElement("div");
         container.id = "typing-alert-container";
 
@@ -12,53 +20,49 @@ export default class TypingAlert {
 
         const chatForm = document.querySelector(".chat-form");
         chatForm.append(container);
-
-        game.socket.on("module.mrkb-chat-enhancements", this.receiveTypingAlert);
+        TypingAlert.#lastText = "";
+    }
+    // Called once on ready.
+    static listen() {
+        game.socket.on(SOCKET, TypingAlert.receiveTypingAlert);
+        setInterval(() => {
+            if (TypingAlert.#typing.size > 0) TypingAlert.handleTypingAlert();
+        }, 1000);
     }
     static emitTypingAlert() {
-        game.socket.emit("module.mrkb-chat-enhancements", {
+        const now = Date.now();
+        if (now - TypingAlert.#lastEmit < EMIT_INTERVAL) return;
+        TypingAlert.#lastEmit = now;
+
+        game.socket.emit(SOCKET, {
             type: "typingAlert",
             userId: game.user.id,
             userName: game.user.name
         });
     }
     static receiveTypingAlert(data) {
-        if (data.type !== "typingAlert") return;
+        if (data?.type !== "typingAlert") return;
 
         const {userId, userName} = data;
-        const timestamp = Date.now();
-        const players = Setting.get("typing-players") || [];
-        const existing = players?.find(e => e.userId === userId);
-
-        if (existing) {
-            existing.timestamp = timestamp;
-        } else {
-            players.push({userId, userName, timestamp});
+        TypingAlert.#typing.set(userId, {userName, timestamp: Date.now()});
+        TypingAlert.handleTypingAlert();
+    }
+    static handleTypingAlert() {
+        const now = Date.now();
+        for (const [userId, e] of TypingAlert.#typing) {
+            if (now - e.timestamp >= TIMEOUT) TypingAlert.#typing.delete(userId);
         }
 
-        Setting.set("typing-players", players);
-    }
-    static handleTypingAlert(players) {
+        const playersList = [...TypingAlert.#typing.values()].map(e => e.userName).filter(name => name !== game.user.name).sort();
+        const text = playersList.length === 0 ? "" : `${playersList.join(game.i18n.lang === "ja" ? "、" : ", ")} ${playersList.length === 1 ? game.i18n.localize("MRKB.IsTyping") : game.i18n.localize("MRKB.AreTyping")}`;
+        if (text === TypingAlert.#lastText) return;
+        TypingAlert.#lastText = text;
+
         const typingAlertContainer = document.querySelector("#typing-alert-container");
         const typingAlertText = document.querySelector("#typing-alert-text");
+        if (!typingAlertContainer || !typingAlertText) return;
 
-        const playersList = players.map(e => e.userName).filter(name => name !== game.user.name).sort();
-
-        typingAlertText.innerText = `${playersList.join(game.i18n.lang === "ja" ? "、" : ", ")} ${playersList.length === 1 ? game.i18n.localize("MRKB.IsTyping") : game.i18n.localize("MRKB.AreTyping")}`;
-
+        typingAlertText.innerText = text;
         typingAlertContainer.classList.toggle("active", playersList.length > 0);
-    }
-    static clearOldTypingAlerts() {
-        const players = Setting.get("typing-players") || [];
-        const currentTime = Date.now();
-        const timeout = 2000;
-
-        const updatedPlayers = players.filter(e => (currentTime - e.timestamp) < timeout);
-        Setting.set("typing-players", updatedPlayers);
-    }
-    static startClearingInterval() {
-        setInterval(() => {
-            this.clearOldTypingAlerts();
-        }, 1000);
     }
 }

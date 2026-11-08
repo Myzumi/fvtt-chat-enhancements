@@ -9,7 +9,6 @@ export default class TurnNotice {
 
         if (game.users.activeGM?._id === game.user._id) {
             ChatMessage.create({
-                type : 0,
                 speaker : {
                     actor : token?.actor?.id,
                     alias : turnTitle

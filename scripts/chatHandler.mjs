@@ -38,7 +38,6 @@ export default class ChatHandler {
             const { command, args, rest} = this.parseSlashCommand(message);
             if (command === "desc" || command === "description") {
                 ChatMessage.create({
-                    type : 0,
                     speaker : sender.speaker,
                     content : rest
                 }, {
@@ -51,7 +50,6 @@ export default class ChatHandler {
                     return false;
                 }
                 ChatMessage.create({
-                    type : 0,
                     speaker : sender.speaker,
                     content : rest
                 }, {
@@ -65,7 +63,6 @@ export default class ChatHandler {
                     return false;
                 }
                 ChatMessage.create({
-                    type : 0,
                     speaker : {
                         actor : targetActor.id,
                         alias : targetActor.name
@@ -109,14 +106,8 @@ export default class ChatHandler {
         if (chatType === "eas") speaker.alias = "긴급 재난 문자";
 
         const getOrder = () => {
-            const order = lastMessage.getFlag("mrkb-chat-enhancements", "order");
-            if (order) return order + 1;
-            else {
-                const arr = [];
-                messages.forEach((e) => arr.push(e.flags["mrkb-chat-enhancements"]?.order));
-                const orders = arr.filter((e) => !isNaN(e));
-                return (orders.length === 0) ? 0 : Math.max(...orders) + 2;
-            }
+            const orders = messages.map((e) => e.flags["mrkb-chat-enhancements"]?.order).filter(Number.isFinite);
+            return (orders.length === 0) ? 0 : Math.max(...orders) + 1;
         }
 
         const messages = game.messages.contents;
@@ -218,10 +209,9 @@ export default class ChatHandler {
         const isAuthor = message.isAuthor;
 
         html.classList.add(type ?? "normal");
-        if (order || order === 0) {
-            html.dataset.order = order;
-            html.style.order = order;
-        }
+        // Only exposed for the exporter. Do NOT use it as CSS `order`: Foundry already renders
+        // messages chronologically, and any message without a valid flag would be drawn out of place.
+        if (order || order === 0) html.dataset.order = order;
 
         if (added && Setting.get("chat-merge")) html.classList.add("added");
         if (isAuthor) html.classList.add("self");
@@ -239,40 +229,34 @@ export default class ChatHandler {
         const setFlag = (msg, flag, value) => {
             return msg.setFlag("mrkb-chat-enhancements", flag, value);
         }
-        const reOrdered = msgs.map((e, i) => {
+        // Give messages without a valid order flag one just after their predecessor.
+        let prevOrder;
+        msgs.forEach((e) => {
             const order = getFlag(e, "order");
-            if (!order && order !== 0) {
-                setFlag(e, "order", i + 0.1);
-            }
-            const conflicted = msgs.filter(a => a.id !== e.id && getFlag(a, "order") === order);
-            if (conflicted.length === 0) return e;
+            if (Number.isFinite(order)) prevOrder = order;
             else {
-                conflicted.forEach((a, idx) => {
-                    setFlag(a, "order", order + ((idx + 1) * 0.1));
-                });
-                setFlag(e, "order", order);
-                return e;
+                prevOrder = (prevOrder ?? 0) + 0.1;
+                setFlag(e, "order", prevOrder);
             }
         });
-        reOrdered.forEach((e) => {
+        msgs.forEach((e, i) => {
             const type = getFlag(e, "type");
             const isAdded = getFlag(e, "added");
             const hasParent = !!getFlag(e, "parent");
-            const parent = hasParent ? msgs.find(a => a.id === getFlag(e, "parent")) : null;
-            const prev = msgs[msgs.indexOf(e) - 1];
+            const prev = msgs[i - 1];
             const option = {
                 type : type,
                 desc : type === "desc",
                 kakao : type === "kakao",
                 truner : type === "turner"
             }
-            if (msgs.indexOf(e) === 0) {
+            if (i === 0) {
                 if (game.user.isGM) {
                     if (isAdded) setFlag(e, "added", false);
                     if (hasParent) setFlag(e, "parent", null);
                 }
                 document.querySelector(`[data-message-id="${e.id}"]`)?.classList?.remove("added");
-            }else if (!parent && !this.isFamily(prev, e, e.speaker, option)) {
+            }else if (!this.isFamily(prev, e, e.speaker, option)) {
                 if (game.user.isGM) {
                     if (isAdded) setFlag(e, "added", false);
                     if (hasParent) setFlag(e, "parent", null);
@@ -281,7 +265,7 @@ export default class ChatHandler {
             } else {
                 if (game.user.isGM) {
                     if (!isAdded) setFlag(e, "added", true);
-                    if (parent !== prev.id) setFlag(e, "parent", prev.id);
+                    if (getFlag(e, "parent") !== prev.id) setFlag(e, "parent", prev.id);
                 }
                 document.querySelector(`[data-message-id="${e.id}"]`)?.classList?.add("added");
             }
