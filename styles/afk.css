@@ -1,0 +1,33 @@
+/* AFK lines in chat: small, grey and italic so they barely take space. */
+.chat-message.message.afk {
+    padding: 0 8px !important;
+    margin: 2px 4px !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: none !important;
+    backdrop-filter: none !important;
+    text-align: center;
+}
+.chat-message.message.afk .message-header {
+    display: none;
+}
+.chat-log .chat-message.message.afk .message-content,
+.chat-log .chat-message.message.afk .message-content * {
+    font-size: var(--font-size-11, 11px) !important;
+    font-style: italic;
+    color: var(--color-text-subtle, #888) !important;
+}
+
+/* Player list: [AFK] tag plus Foundry's own idle look (dimmed name, sleep icon). */
+#players .player.mrkb-afk .player-name {
+    color: var(--player-name-idle-color);
+}
+#players .player.mrkb-afk .player-name::after {
+    content: "\f880";
+    font-family: var(--font-awesome);
+    margin-left: 0.5em;
+}
+#players .player .mrkb-afk-tag {
+    font-weight: bold;
+}

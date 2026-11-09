@@ -1,3 +1,5 @@
+import RollFolding from "./rollFolding/state.mjs";
+
 export default class Setting {
 	static get(key) {
 		return game.settings.get("mrkb-chat-enhancements", key);
@@ -60,6 +62,30 @@ export default class Setting {
 				const chatLog = ui.chat.element.querySelector(".chat-log");
 				chatLog.classList.toggle("font-applied", value);
 			}
+		});
+
+		game.settings.register("mrkb-chat-enhancements", "roll-folding-mode", {
+			name: "MRKB.RollFoldingMode",
+			hint: "MRKB.RollFoldingModeHint",
+			scope: "world",
+			config: true,
+			type: String,
+			choices: {
+				players: "MRKB.RollFoldingPlayers",
+				on: "MRKB.RollFoldingOn",
+				off: "MRKB.RollFoldingOff"
+			},
+			default: "players",
+			onChange: () => RollFolding.onSettingChange()
+		});
+		game.settings.register("mrkb-chat-enhancements", "roll-folding", {
+			name: "MRKB.RollFolding",
+			hint: "MRKB.RollFoldingHint",
+			scope: "client",
+			config: true,
+			type: Boolean,
+			default: false,
+			onChange: () => RollFolding.onSettingChange()
 		});
 
 		game.settings.register("mrkb-chat-enhancements", "actor-favorites", {

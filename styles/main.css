@@ -7,6 +7,8 @@
 @import "./systems.css";
 @import "./tooltip.css";
 @import "./typingAlert.css";
+@import "./rollFolding.css";
+@import "./afk.css";
 
 body {
     --gothic-regular: 'NEXON Lv1 Gothic OTF', "Hiragino Kaku Gothic ProN", "Calibri", var(--font-sans), sans-serif;

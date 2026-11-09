@@ -240,14 +240,15 @@
     display: none;
 }
 .chat-message.message.description .message-content {
-    display: flex;
-    justify-content: center;
+    display: block;
+    text-align: center;
     font-style: italic;
 }
 .chat-log.font-applied .chat-message.message.description .message-content {
     font-family: var(--gothic-bold), sans-serif;
 }
 .chat-message.message.description .message-content img {
+    display: block;
     max-width: 100%;
     margin: auto;
 }

@@ -1,0 +1,99 @@
+/* Roll folding: roll results shown inside their dnd5e item card (only while .mrkb-roll-folding is set). */
+
+/* Folded rolls are hidden in every chat log (sidebar, popout, notifications) on purpose: the class is only
+   ever added while folding is active, and a log may miss the .mrkb-roll-folding container class briefly. */
+.chat-message.message.mrkb-folded,
+.chat-log.mrkb-roll-folding .mrkb-slot-source {
+    display: none !important;
+}
+
+/* Unrolled card buttons as full-width labeled bars (v13 style). */
+.chat-log.mrkb-roll-folding .chat-card .icon-row:has([data-action^="roll"]) > ul {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: 4px;
+}
+.chat-log.mrkb-roll-folding .chat-card .icon-row:has([data-action^="roll"]) > ul > li {
+    width: 100%;
+}
+.chat-log.mrkb-roll-folding .chat-card .icon-row button.icon[data-action^="roll"] {
+    width: 100%;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+.chat-log.mrkb-roll-folding .chat-card .icon-row button.icon[data-action^="roll"]::after {
+    content: attr(aria-label);
+}
+
+/* Result rows. */
+.chat-log.mrkb-roll-folding .mrkb-roll-slot {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+    gap: 4px;
+    width: 100%;
+}
+.chat-log.mrkb-roll-folding .mrkb-roll-slot > section.icon-row {
+    margin: 0;
+    min-width: 0;
+}
+.chat-log.mrkb-roll-folding .mrkb-roll-slot > damage-application,
+.chat-log.mrkb-roll-folding .mrkb-roll-slot > .mrkb-slot-targets {
+    grid-column: 1 / -1;
+}
+.chat-log.mrkb-roll-folding .mrkb-roll-slot damage-application .card-tray > label {
+    min-height: 32px;
+    display: flex;
+    align-items: center;
+}
+.chat-log.mrkb-roll-folding .mrkb-reroll {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.chat-log.mrkb-roll-folding .mrkb-reroll-count {
+    font-size: var(--font-size-11, 11px);
+    font-weight: bold;
+    color: var(--color-text-secondary);
+    cursor: help;
+}
+.chat-log.mrkb-roll-folding .mrkb-roll-slots {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 4px;
+}
+
+/* A card followed only by hidden folded rolls still closes its box. */
+.chat-log.mrkb-roll-folding .chat-message.message:not(.mrkb-folded):has(+ .mrkb-folded) {
+    padding-bottom: 8px;
+    margin-bottom: 4px;
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+}
+/* The first visible message after a folded run starts a new box. */
+.chat-log.mrkb-roll-folding .mrkb-folded + .chat-message.message.added:not(.mrkb-folded) {
+    padding-top: 4px;
+    margin-top: 4px;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+}
+.chat-log.mrkb-roll-folding .mrkb-folded + .chat-message.message.added:not(.mrkb-folded) .message-header {
+    justify-content: flex-start;
+}
+.chat-log.mrkb-roll-folding .mrkb-folded + .chat-message.message.added:not(.mrkb-folded) .message-header h4,
+.chat-log.mrkb-roll-folding .mrkb-folded + .chat-message.message.added:not(.mrkb-folded) .message-header img {
+    display: revert;
+}

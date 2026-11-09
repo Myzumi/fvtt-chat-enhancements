@@ -28,6 +28,23 @@
         "AreTyping": "さんたちが入力中...",
         "Unclassified": "未分類",
         "UsePortrait": "チャットにポートレートを使用",
-        "UsePortraitHint": "独自のポートレートを使用します。D&D5eシステムなど、ポートレートを強制するシステムや他のモジュールとの互換性のために無効にすることができます。"
+        "UsePortraitHint": "独自のポートレートを使用します。D&D5eシステムなど、ポートレートを強制するシステムや他のモジュールとの互換性のために無効にすることができます。",
+        "RollFolding": "Fold Rolls into Item Cards",
+        "RollFoldingHint": "Shows attack, damage, healing and formula results inside the item card instead of as separate messages.",
+        "RollFoldingMode": "Roll Folding (GM)",
+        "RollFoldingModeHint": "Let players choose, or force roll folding on or off for everyone.",
+        "RollFoldingPlayers": "Let players decide",
+        "RollFoldingOn": "Always on for everyone",
+        "RollFoldingOff": "Always off for everyone",
+        "RollFoldingForced": "Set by your GM",
+        "RollFoldingUnsupported": "Requires dnd5e 6 on Foundry v14",
+        "Reroll": "Reroll",
+        "RerollEarlier": "Earlier: {totals}",
+        "AfkOn": "{name} is now AFK",
+        "AfkOnReason": "{name} is now AFK: {reason}",
+        "AfkOff": "{name} is no longer AFK",
+        "AfkTag": "[AFK]",
+        "AfkTooltip": "AFK since {time}",
+        "AfkTooltipReason": "AFK since {time}: {reason}"
     }
 }

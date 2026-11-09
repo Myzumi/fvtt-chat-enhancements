@@ -1,4 +1,21 @@
-import {ASSETS_PATH} from "./constants.mjs";
+import {ASSETS_PATH, MODULE_ID} from "./constants.mjs";
+import {parse} from "./markdownParser.mjs";
+import {textToHtml} from "./chatText.mjs";
+
+// Text shown in the edit box: what the player typed (stored on send), or the HTML for older messages.
+export function editableText(message) {
+    return message.flags?.[MODULE_ID]?.source ?? message.content;
+}
+// Update for a saved edit: formatted like a freshly sent message, keeping the typed text for the next edit.
+// Messages typed in the v14 chat box were sent as "<p>…</p>", so their edits are wrapped the same way;
+// command messages (/desc …) and older messages without stored text are parsed as they are.
+export function editUpdate(text, message) {
+    const typedInChatBox = message?.flags?.[MODULE_ID]?.source !== undefined && /^\s*<p[\s>]/i.test(message.content ?? "");
+    return {
+        content: parse(typedInChatBox ? textToHtml(text) : text),
+        [`flags.${MODULE_ID}.source`]: text
+    };
+}
 
 export default class ChatEditor {
     static initialize() {
@@ -31,12 +48,7 @@ export default class ChatEditor {
         message.classList.remove("disabled");
         editor.classList.add("disabled");
 
-        let con = editor.value;
-        con = con.replace(/\*\*(.*)\*\*/g,"<b>$1</b>");
-        con = con.replace(/\*(.*)\*/g,"<i>$1</i>");
-        con = con.replace(/( )(?![^<]*>|[^<>]*<)/g,"&nbsp;");
-
-        msg.update({content : con});
+        msg.update(editUpdate(editor.value, msg));
         editor.value = "";
         message.focus();
     }
@@ -58,7 +70,7 @@ export default class ChatEditor {
         chatter.classList.add("disabled");
         editor.classList.remove("disabled");
         editor.dataset.mid = id;
-        editor.value = message.content;
+        editor.value = editableText(message);
         editor.focus();
     }
 }

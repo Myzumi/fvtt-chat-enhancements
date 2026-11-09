@@ -4,6 +4,8 @@ import ChatEditor from "./chatEditor.mjs";
 import getPortrait from "./getPortrait.mjs";
 import {parse} from "./markdownParser.mjs";
 import ActorControl from "./actorControl.mjs";
+import AfkStatus from "./afk.mjs";
+import {htmlToText} from "./chatText.mjs";
 
 export default class ChatHandler {
     static parseSlashCommand(content) {
@@ -34,8 +36,12 @@ export default class ChatHandler {
 
             return { targetActor, content };
         }
-        if (message.trim().startsWith("/")) {
-            const { command, args, rest} = this.parseSlashCommand(message);
+        // v14's chat input sends HTML ("<p>/desc …</p>"); read commands from the plain typed text.
+        const text = htmlToText(message);
+        // AFK: /afk toggles; any other line while AFK ends it first and is then re-sent unchanged.
+        if (AfkStatus.handleChat(text, () => ui.chat.processMessage(message)) === false) return false;
+        if (text.trim().startsWith("/")) {
+            const { command, args, rest} = this.parseSlashCommand(text);
             if (command === "desc" || command === "description") {
                 ChatMessage.create({
                     speaker : sender.speaker,
@@ -100,6 +106,7 @@ export default class ChatHandler {
         let chatType = Setting.get("talk-mode");
         if (options.mrkbturn) chatType = "turn";
         if (options.mrkbdesc) chatType = "description";
+        if (options.mrkbafk) chatType = "afk";
 
         let con = parse(message.content);
 
@@ -119,6 +126,8 @@ export default class ChatHandler {
         option.added = isFamily ?? false;
         option.parent = isFamily ? lastMessage.id : null;
         option.order = lastMessage ? getOrder() : 0;
+        // What the player typed, so the editor can show it instead of the generated HTML.
+        option.source = htmlToText(message.content);
 
         message.updateSource({
             style : style,
@@ -139,6 +148,8 @@ export default class ChatHandler {
             !options.turner &&
             type !== "description" &&
             type !== "turn" &&
+            type !== "afk" &&
+            options.type !== "afk" &&
             (type === options.type || (type === "normal" && options.type === "thinking") || (type === "thinking" && options.type === "normal"))
         )
     }
