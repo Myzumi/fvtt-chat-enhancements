@@ -92,3 +92,14 @@ export function messageAfter(visibleMessages, message) {
     if (index >= 0) return visibleMessages[index + 1] ?? null;
     return visibleMessages.find((m) => m !== message && m.timestamp > message.timestamp) ?? null;
 }
+
+// Small title shown above each folded result, so it is clear which roll is which.
+const SLOT_LABELS = {
+    rollAttack: { key: "MRKB.RollLabelAttack", icon: "fa-sword" },
+    rollDamage: { key: "MRKB.RollLabelDamage", icon: "fa-burst" },
+    rollHealing: { key: "MRKB.RollLabelHealing", icon: "fa-heart" },
+    rollFormula: { key: "MRKB.RollLabelFormula", icon: "fa-dice" }
+};
+export function slotLabel(action) {
+    return SLOT_LABELS[action] ? { ...SLOT_LABELS[action] } : null;
+}

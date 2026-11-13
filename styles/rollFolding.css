@@ -45,6 +45,18 @@
     margin: 0;
     min-width: 0;
 }
+.chat-log.mrkb-roll-folding .mrkb-roll-slot > .mrkb-slot-label {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 2px;
+    font-size: var(--font-size-10, 10px);
+    font-weight: bold;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+}
 .chat-log.mrkb-roll-folding .mrkb-roll-slot > damage-application,
 .chat-log.mrkb-roll-folding .mrkb-roll-slot > .mrkb-slot-targets {
     grid-column: 1 / -1;
@@ -94,6 +106,7 @@
     justify-content: flex-start;
 }
 .chat-log.mrkb-roll-folding .mrkb-folded + .chat-message.message.added:not(.mrkb-folded) .message-header h4,
-.chat-log.mrkb-roll-folding .mrkb-folded + .chat-message.message.added:not(.mrkb-folded) .message-header img {
+.chat-log.mrkb-roll-folding .mrkb-folded + .chat-message.message.added:not(.mrkb-folded) .message-header img:not(.message-portrait) {
     display: revert;
 }
+/* Folding only runs on dnd5e, which shows its own avatar; keep the module's portrait hidden as usual. */

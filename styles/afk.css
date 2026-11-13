@@ -1,12 +1,11 @@
-/* AFK lines in chat: small, grey and italic so they barely take space. */
+/* AFK lines in chat: a small chip with the normal message look, only as wide as its text. */
 .chat-message.message.afk {
-    padding: 0 8px !important;
-    margin: 2px 4px !important;
-    border: 0 !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-    background: none !important;
-    backdrop-filter: none !important;
+    align-self: center;
+    width: fit-content;
+    max-width: calc(100% - 16px);
+    padding: 2px 10px !important;
+    margin: 4px auto !important;
+    border-radius: 6px !important;
     text-align: center;
 }
 .chat-message.message.afk .message-header {

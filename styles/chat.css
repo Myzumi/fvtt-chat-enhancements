@@ -197,7 +197,9 @@
     font-size: var(--font-size);
     text-indent: 0;
     line-height: 150%;
-    word-break: break-all;
+    /* Wrap between words (also keeps Korean words whole); only split strings too long to fit, e.g. URLs. */
+    word-break: keep-all;
+    overflow-wrap: anywhere;
 }
 .chat-log.color-applied .chat-message.message .message-content {
     color: var(--color-text-secondary);

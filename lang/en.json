@@ -45,6 +45,10 @@
         "AfkOff": "{name} is no longer AFK",
         "AfkTag": "[AFK]",
         "AfkTooltip": "AFK since {time}",
-        "AfkTooltipReason": "AFK since {time}: {reason}"
+        "AfkTooltipReason": "AFK since {time}: {reason}",
+        "RollLabelAttack": "Attack Roll",
+        "RollLabelDamage": "Damage Roll",
+        "RollLabelHealing": "Healing Roll",
+        "RollLabelFormula": "Roll"
     }
 }

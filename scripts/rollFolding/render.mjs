@@ -1,5 +1,5 @@
 import RollFolding from "./state.mjs";
-import { foldTarget, slotsForCard, rollTotal, messageAfter } from "./decide.mjs";
+import { foldTarget, slotsForCard, rollTotal, messageAfter, slotLabel } from "./decide.mjs";
 
 export const ROLL_ACTIONS = ["rollAttack", "rollDamage", "rollHealing", "rollFormula"];
 
@@ -153,6 +153,15 @@ export default class RollFoldingRender {
         slot.className = "mrkb-roll-slot";
         slot.dataset.messageId = latest.id;
         slot.dataset.action = action;
+
+        const label = slotLabel(action);
+        if (label) {
+            const title = document.createElement("div");
+            title.className = "mrkb-slot-label";
+            title.innerHTML = `<i class="fa-solid ${label.icon}" inert></i>`;
+            title.append(" ", game.i18n.localize(label.key));
+            slot.append(title);
+        }
         slot.append(result.cloneNode(true));
 
         const reroll = document.createElement("button");
