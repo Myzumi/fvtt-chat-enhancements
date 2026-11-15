@@ -6,6 +6,7 @@ import {parse} from "./markdownParser.mjs";
 import ActorControl from "./actorControl.mjs";
 import AfkStatus from "./afk.mjs";
 import {htmlToText} from "./chatText.mjs";
+import {sameAudience} from "./audience.mjs";
 
 export default class ChatHandler {
     static parseSlashCommand(content) {
@@ -144,6 +145,9 @@ export default class ChatHandler {
             speaker.alias === parent.speaker.alias &&
             speaker.actor === parent.speaker.actor &&
             child.author._id === parent.author._id &&
+            // Whispers only merge with whispers to the same people; otherwise a public message could
+            // hide under a whisper's "To: …" header (and lose its sender for viewers who can't see the whisper).
+            sameAudience(parent, child) &&
             !options.desc &&
             !options.turner &&
             type !== "description" &&
