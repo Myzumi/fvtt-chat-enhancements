@@ -279,7 +279,9 @@
     margin: 0;
     z-index: 1;
 }
-.chat-message.message.turn .message-header .message-sender span {
+/* Hide only the player line; dnd5e puts the name itself in a span too (.name-stacked > .title). */
+.chat-message.message.turn .message-header .message-sender .message-user,
+.chat-message.message.turn .message-header .message-sender .subtitle {
     display: none;
 }
 .chat-message.message.turn .message-header .message-metadata {

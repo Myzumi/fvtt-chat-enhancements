@@ -49,6 +49,7 @@
         "RollLabelAttack": "Attack Roll",
         "RollLabelDamage": "Damage Roll",
         "RollLabelHealing": "Healing Roll",
-        "RollLabelFormula": "Roll"
+        "RollLabelFormula": "Roll",
+        "TurnTitle": "{name}'s Turn"
     }
 }
