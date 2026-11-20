@@ -49,7 +49,7 @@
     grid-column: 1 / -1;
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 4px 8px;
     margin-top: 2px;
     font-size: var(--font-size-10, 10px);
     font-weight: bold;
@@ -60,6 +60,31 @@
 .chat-log.mrkb-roll-folding .mrkb-roll-slot > damage-application,
 .chat-log.mrkb-roll-folding .mrkb-roll-slot > .mrkb-slot-targets {
     grid-column: 1 / -1;
+}
+/* dnd5e's "Item actions" icon stays next to the first roll instead of floating in the middle of the stack. */
+.chat-log.mrkb-roll-folding .chat-card .icon-row:has(.mrkb-roll-slot) > i {
+    align-self: flex-start;
+    margin-top: 6px;
+}
+/* Targets in the label line, right of "Attack Roll"; several targets wrap onto more lines. */
+.chat-log.mrkb-roll-folding .mrkb-slot-label > .mrkb-slot-title {
+    flex: none;
+    align-self: flex-end;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.chat-log.mrkb-roll-folding .mrkb-slot-label > ul.mrkb-slot-targets {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 2px;
+    margin: 0;
+    font-weight: normal;
+    letter-spacing: normal;
+    text-transform: none;
 }
 .chat-log.mrkb-roll-folding .mrkb-roll-slot damage-application .card-tray > label {
     min-height: 32px;

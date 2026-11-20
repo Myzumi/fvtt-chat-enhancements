@@ -155,11 +155,15 @@ export default class RollFoldingRender {
         slot.dataset.action = action;
 
         const label = slotLabel(action);
+        let title = null;
         if (label) {
-            const title = document.createElement("div");
+            title = document.createElement("div");
             title.className = "mrkb-slot-label";
-            title.innerHTML = `<i class="fa-solid ${label.icon}" inert></i>`;
-            title.append(" ", game.i18n.localize(label.key));
+            const text = document.createElement("span");
+            text.className = "mrkb-slot-title";
+            text.innerHTML = `<i class="fa-solid ${label.icon}" inert></i>`;
+            text.append(" ", game.i18n.localize(label.key));
+            title.append(text);
             slot.append(title);
         }
         slot.append(result.cloneNode(true));
@@ -180,11 +184,16 @@ export default class RollFoldingRender {
             count.dataset.tooltip = game.i18n.format("MRKB.RerollEarlier", { totals });
             slot.append(count);
         }
-        // Hit/miss against targets (attack rolls).
-        for (const targets of content.querySelectorAll(":scope > section.icon-row:has(ul.targets)")) {
-            const row = targets.cloneNode(true);
-            row.classList.add("mrkb-slot-targets");
-            slot.append(row);
+        // Hit/miss against targets (attack rolls): in the label line, above the roll bar.
+        for (const targets of content.querySelectorAll(":scope > section.icon-row:has(ul.targets li)")) {
+            const pills = targets.querySelector("ul.targets").cloneNode(true);
+            pills.classList.add("mrkb-slot-targets");
+            if (title) title.append(pills);
+            else {
+                const row = targets.cloneNode(true);
+                row.classList.add("mrkb-slot-targets");
+                slot.append(row);
+            }
         }
         // Only where dnd5e itself offers the Apply tray (GM or allowed players, not private rolls).
         if (content.querySelector("damage-application")) {
