@@ -7,6 +7,7 @@ import ActorControl from "./actorControl.mjs";
 import AfkStatus from "./afk.mjs";
 import {htmlToText} from "./chatText.mjs";
 import {sameAudience} from "./audience.mjs";
+import {previousShown, nextShown} from "./chatOrder.mjs";
 
 export default class ChatHandler {
     static parseSlashCommand(content) {
@@ -220,7 +221,7 @@ export default class ChatHandler {
     static checkChatFlag(message, html) {
         const order = message.getFlag("mrkb-chat-enhancements", "order");
         const type = message.getFlag("mrkb-chat-enhancements", "type");
-        const added = message.getFlag("mrkb-chat-enhancements", "added");
+        const added = this.joinsPrevious(message);
         const isAuthor = message.isAuthor;
 
         html.classList.add(type ?? "normal");
@@ -230,6 +231,26 @@ export default class ChatHandler {
 
         if (added && Setting.get("chat-merge")) html.classList.add("added");
         if (isAuthor) html.classList.add("self");
+    }
+    // Whether a message joins the box of the message shown above it, for this viewer. Decided when drawn,
+    // not from the stored `added` flag: that was set by the sender before other people's messages
+    // (sent at the same moment, or whispers this viewer can't see) were known.
+    static joinsPrevious(message) {
+        if (!message.getFlag("mrkb-chat-enhancements", "type")) return false;
+        const prev = previousShown(game.messages.contents, message);
+        const type = message.getFlag("mrkb-chat-enhancements", "type");
+        return !!prev && this.isFamily(prev, message, message.speaker, { type });
+    }
+    // A message arrived late or was removed: the one shown after it may now join or leave its box.
+    static refreshNext(message) {
+        try {
+            const next = nextShown(game.messages.contents, message);
+            if (!next) return;
+            const join = this.joinsPrevious(next) && Setting.get("chat-merge");
+            for (const el of document.querySelectorAll(`.chat-log [data-message-id="${next.id}"]`)) el.classList.toggle("added", join);
+        } catch (err) {
+            console.warn("mrkb-chat-enhancements | chat merge", err);
+        }
     }
     static fixChatFlag(fixEveryMessages = false) {
         if (game.messages.size === 0) return;
@@ -254,37 +275,8 @@ export default class ChatHandler {
                 setFlag(e, "order", prevOrder);
             }
         });
-        msgs.forEach((e, i) => {
-            const type = getFlag(e, "type");
-            const isAdded = getFlag(e, "added");
-            const hasParent = !!getFlag(e, "parent");
-            const prev = msgs[i - 1];
-            const option = {
-                type : type,
-                desc : type === "desc",
-                kakao : type === "kakao",
-                truner : type === "turner"
-            }
-            if (i === 0) {
-                if (game.user.isGM) {
-                    if (isAdded) setFlag(e, "added", false);
-                    if (hasParent) setFlag(e, "parent", null);
-                }
-                document.querySelector(`[data-message-id="${e.id}"]`)?.classList?.remove("added");
-            }else if (!this.isFamily(prev, e, e.speaker, option)) {
-                if (game.user.isGM) {
-                    if (isAdded) setFlag(e, "added", false);
-                    if (hasParent) setFlag(e, "parent", null);
-                }
-                document.querySelector(`[data-message-id="${e.id}"]`)?.classList?.remove("added");
-            } else {
-                if (game.user.isGM) {
-                    if (!isAdded) setFlag(e, "added", true);
-                    if (getFlag(e, "parent") !== prev.id) setFlag(e, "parent", prev.id);
-                }
-                document.querySelector(`[data-message-id="${e.id}"]`)?.classList?.add("added");
-            }
-        });
+        // Merged boxes are decided per viewer when messages are drawn (joinsPrevious / refreshNext),
+        // so the stored `added`/`parent` flags no longer need repairing here.
         return fixEveryMessages ? ui.notifications.info("대화 플래그 수정이 완료되었습니다.") : null;
     }
 }

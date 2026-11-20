@@ -53,16 +53,23 @@ Hooks.on("chatMessage", (chatLog, message, sender) => ChatHandler.chatProcessor(
 Hooks.on("preCreateChatMessage", (message, source, options, id) => ChatHandler.preProcesser(message, source, options, id));
 Hooks.on("createChatMessage", (message, option, id) => {
     ChatHandler.createProcesser(message, option, id);
+    ChatHandler.refreshNext(message);
     RollFoldingRender.onRollChange(message, { created: true });
 });
-Hooks.on("updateChatMessage", (message) => RollFoldingRender.onRollChange(message));
+Hooks.on("updateChatMessage", (message) => {
+    ChatHandler.refreshNext(message);
+    RollFoldingRender.onRollChange(message);
+});
 Hooks.on("renderChatMessageHTML", (message, html, data) => {
     ChatHandler.renderProcesser(message, html, data);
     RollFoldingRender.render(message, html);
 });
 Hooks.on("dnd5e.renderChatMessage", (message, html) => RollFoldingRender.renderCard(message, html));
 Hooks.on("deleteChatMessage", ChatHandler.fixChatFlag.bind(ChatHandler, false));
-Hooks.on("deleteChatMessage", (message) => RollFoldingRender.onRollChange(message));
+Hooks.on("deleteChatMessage", (message) => {
+    ChatHandler.refreshNext(message);
+    RollFoldingRender.onRollChange(message);
+});
 Hooks.on("getChatMessageContextOptions", (chatLog, options) => {
     const editOption = {
         name: game.i18n.localize("MRKB.Edit"),
